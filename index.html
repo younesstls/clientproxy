@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Abonnements Dashboard</title>
+  <style>
+    :root{
+      --bg:#0b1220; --card:#111b2e; --muted:#93a4c7; --text:#eaf1ff;
+      --good:#2ecc71; --warn:#f1c40f; --bad:#ff5c7a; --line:#243150;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,Segoe UI,Arial;background:linear-gradient(180deg,#060a13, #0b1220);color:var(--text)}
+    .wrap{max-width:1100px;margin:0 auto;padding:22px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    h1{margin:0;font-size:22px;letter-spacing:.3px}
+    .sub{color:var(--muted);font-size:13px}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
+    .card{background:rgba(17,27,46,.9);border:1px solid rgba(36,49,80,.8);border-radius:14px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .k{color:var(--muted);font-size:12px}
+    .v{font-size:26px;font-weight:700;margin-top:6px}
+    .panel{margin-top:14px;display:grid;gap:12px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    input, button, select{
+      background:#0e1730;color:var(--text);
+      border:1px solid rgba(36,49,80,.95);border-radius:12px;
+      padding:10px 12px;font-size:14px;outline:none;
+    }
+    input::placeholder{color:#7e8fb6}
+    button{cursor:pointer;transition:.15s transform}
+    button:hover{transform:translateY(-1px)}
+    .btn{background:#17305f}
+    .btn2{background:#1f3b74}
+    .btnDanger{background:#5a1630;border-color:#7a2240}
+    .hint{color:var(--muted);font-size:13px;margin-left:auto}
+    .tableWrap{margin-top:14px;overflow:auto;border-radius:14px;border:1px solid rgba(36,49,80,.85)}
+    table{width:100%;border-collapse:collapse;min-width:900px;background:rgba(17,27,46,.75)}
+    th,td{padding:12px 10px;border-bottom:1px solid rgba(36,49,80,.65);text-align:left}
+    th{position:sticky;top:0;background:#0f1933;z-index:1;font-size:13px;color:#cfe0ff}
+    td{font-size:14px}
+    .tag{display:inline-flex;align-items:center;gap:8px;padding:5px 9px;border-radius:999px;font-size:12px;border:1px solid rgba(255,255,255,.12)}
+    .good{background:rgba(46,204,113,.12);border-color:rgba(46,204,113,.35);color:#b9ffd2}
+    .warn{background:rgba(241,196,15,.12);border-color:rgba(241,196,15,.35);color:#fff1b6}
+    .bad{background:rgba(255,92,122,.12);border-color:rgba(255,92,122,.35);color:#ffc3cf}
+    .muted{color:var(--muted)}
+    .small{font-size:12px;color:var(--muted)}
+    .footer{margin-top:14px;color:var(--muted);font-size:12px;text-align:center}
+    .split{flex:1;min-width:220px}
+    @media (max-width:900px){
+      .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>📊 Abonnements Dashboard</h1>
+        <div class="sub">Clients • Date fin auto • Jours restants • Telegram notifications</div>
+      </div>
+      <div class="row">
+        <button class="btn2" id="btnExport">Export JSON</button>
+        <input type="file" id="fileImport" accept="application/json" style="display:none">
+        <button class="btn2" id="btnImport">Import JSON</button>
+        <button class="btnDanger" id="btnReset">Reset</button>
+      </div>
+    </header>
+
+    <div class="stats">
+      <div class="card"><div class="k">Total</div><div class="v" id="stTotal">0</div></div>
+      <div class="card"><div class="k">Actifs</div><div class="v" id="stActifs">0</div></div>
+      <div class="card"><div class="k">Expire bientôt</div><div class="v" id="stSoon">0</div></div>
+      <div class="card"><div class="k">Expirés</div><div class="v" id="stExpired">0</div></div>
+    </div>
+
+    <div class="panel card">
+      <div class="row">
+        <div class="split">
+          <div class="small">Telegram Bot Token</div>
+          <input id="tgToken" placeholder="YOUR_BOT_TOKEN" style="width:100%">
+        </div>
+        <div class="split">
+          <div class="small">Telegram Chat ID</div>
+          <input id="tgChatId" placeholder="YOUR_CHAT_ID" style="width:100%">
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="small">Notifier si jours ≤</label>
+        <input id="thresh" type="number" min="0" value="2" style="width:90px">
+        <button class="btn" id="btnCheck">Check & Notify Telegram</button>
+        <button class="btn2" id="btnSaveTg">Save Telegram</button>
+        <span class="hint" id="statusTxt">Ready</span>
+      </div>
+
+      <hr style="border:0;border-top:1px solid rgba(36,49,80,.7);width:100%;margin:10px 0">
+
+      <div class="row">
+        <input id="clientName" placeholder="Client (nom)" />
+        <input id="startDate" type="date" />
+        <input id="duration" type="number" min="1" value="30" style="width:120px" />
+        <button class="btn2" id="btnAdd">➕ Add Client</button>
+      </div>
+      <div class="small">مدة الاشتراك بالأيام (default 30). تقدر تغيّرها لكل واحد.</div>
+    </div>
+
+    <div class="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Début</th>
+            <th>Durée</th>
+            <th>Fin</th>
+            <th>Jours restants</th>
+            <th>Statut</th>
+            <th>TelegramSent</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="footer">by.bestfriend • HTML dashboard (LocalStorage) • Online with GitHub Pages</div>
+  </div>
+
+<script>
+(() => {
+  const LS_KEY = "abon_dashboard_clients_v1";
+  const LS_TG = "abon_dashboard_tg_v1";
+
+  const $ = (id) => document.getElementById(id);
+  const st = {
+    total: $("stTotal"),
+    actifs: $("stActifs"),
+    soon: $("stSoon"),
+    expired: $("stExpired"),
+    tbody: $("tbody"),
+    statusTxt: $("statusTxt"),
+    thresh: $("thresh"),
+    clientName: $("clientName"),
+    startDate: $("startDate"),
+    duration: $("duration"),
+    tgToken: $("tgToken"),
+    tgChatId: $("tgChatId"),
+  };
+
+  function setStatus(msg){ st.statusTxt.textContent = msg; }
+
+  function todayISO(){
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function addDaysISO(startISO, days){
+    const d = new Date(startISO + "T00:00:00");
+    d.setDate(d.getDate() + Number(days || 0));
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function daysBetween(endISO){
+    const now = new Date();
+    const end = new Date(endISO + "T23:59:59");
+    const ms = end - now;
+    return Math.ceil(ms / (1000*60*60*24));
+  }
+
+  function statusFromDays(days, thresh){
+    if (days <= 0) return {text:"❌ Expiré", cls:"bad"};
+    if (days <= thresh) return {text:"⏰ Bientôt", cls:"warn"};
+    return {text:"✅ Actif", cls:"good"};
+  }
+
+  function loadClients(){
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); }
+    catch { return []; }
+  }
+
+  function saveClients(clients){
+    localStorage.setItem(LS_KEY, JSON.stringify(clients));
+  }
+
+  function loadTg(){
+    try { return JSON.parse(localStorage.getItem(LS_TG) || "{}"); }
+    catch { return {}; }
+  }
+
+  function saveTg(obj){
+    localStorage.setItem(LS_TG, JSON.stringify(obj));
+  }
+
+  function render(){
+    const clients = loadClients();
+    const thresh = Number(st.thresh.value || 2);
+
+    let total=clients.length, actifs=0, soon=0, expired=0;
+
+    st.tbody.innerHTML = "";
+
+    clients.forEach((c, idx) => {
+      const end = addDaysISO(c.start, c.duration);
+      const left = daysBetween(end);
+      const stt = statusFromDays(left, thresh);
+
+      if (left <= 0) expired++;
+      else if (left <= thresh) soon++;
+      else actifs++;
+
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td><strong>${escapeHtml(c.name)}</strong></td>
+        <td class="muted">${c.start}</td>
+        <td class="muted">${c.duration} j</td>
+        <td class="muted">${end}</td>
+        <td><strong>${left}</strong> <span class="small">jours</span></td>
+        <td><span class="tag ${stt.cls}">${stt.text}</span></td>
+        <td class="muted">${c.telegramSent ? "✅" : "—"}</td>
+        <td>
+          <button class="btn2" data-act="renew" data-i="${idx}">Renew +30</button>
+          <button class="btn2" data-act="edit" data-i="${idx}">Edit</button>
+          <button class="btnDanger" data-act="del" data-i="${idx}">Delete</button>
+        </td>
+      `;
+
+      st.tbody.appendChild(tr);
+    });
+
+    st.total.textContent = total;
+    st.actifs.textContent = actifs;
+    st.soon.textContent = soon;
+    st.expired.textContent = expired;
+  }
+
+  function escapeHtml(s){
+    return String(s||"").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
+  }
+
+  async function sendTelegram(text){
+    const cfg = loadTg();
+    const token = (st.tgToken.value || cfg.token || "").trim();
+    const chatId = (st.tgChatId.value || cfg.chatId || "").trim();
+
+    if (!token || !chatId) {
+      throw new Error("Telegram token/chat_id man9awhomch. 3ammerhom w Save.");
+    }
+
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
+    const r = await fetch(url, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ chat_id: chatId, text })
+    });
+
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.description || "Telegram error");
+    return data;
+  }
+
+  async function checkAndNotify(){
+    const clients = loadClients();
+    const thresh = Number(st.thresh.value || 2);
+
+    let sent = 0;
+    for (let i=0; i<clients.length; i++){
+      const c = clients[i];
+      const end = addDaysISO(c.start, c.duration);
+      const left = daysBetween(end);
+
+      if (left <= thresh && left > -9999 && !c.telegramSent) {
+        const msg =
+`⏰ Abonnement قريب يسالي
+👤 Client: ${c.name}
+📆 Fin: ${end}
+⏳ باقي: ${left} أيام`;
+        await sendTelegram(msg);
+        c.telegramSent = true;
+        sent++;
+      }
+    }
+
+    saveClients(clients);
+    render();
+    setStatus(sent ? `✅ Sent ${sent} Telegram msg(s)` : "No notifications to send.");
+  }
+
+  // Actions
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    const act = btn.getAttribute("data-act");
+    const i = btn.getAttribute("data-i");
+    if (!act) return;
+
+    const clients = loadClients();
+    const idx = Number(i);
+
+    if (act === "del") {
+      if (!confirm("Delete this client?")) return;
+      clients.splice(idx, 1);
+      saveClients(clients);
+      render();
+      return;
+    }
+
+    if (act === "renew") {
+      // renew: start = today, telegramSent=false, duration stays
+      clients[idx].start = todayISO();
+      clients[idx].telegramSent = false;
+      saveClients(clients);
+      render();
+      return;
+    }
+
+    if (act === "edit") {
+      const c = clients[idx];
+      const newName = prompt("Client name:", c.name);
+      if (newName === null) return;
+      const newStart = prompt("Start date (YYYY-MM-DD):", c.start);
+      if (newStart === null) return;
+      const newDur = prompt("Duration days:", String(c.duration));
+      if (newDur === null) return;
+
+      clients[idx].name = newName.trim() || c.name;
+      clients[idx].start = newStart.trim() || c.start;
+      clients[idx].duration = Number(newDur) || c.duration;
+      clients[idx].telegramSent = false; // reset after edit
+      saveClients(clients);
+      render();
+      return;
+    }
+  });
+
+  $("btnAdd").addEventListener("click", () => {
+    const name = st.clientName.value.trim();
+    const start = (st.startDate.value || todayISO()).trim();
+    const duration = Number(st.duration.value || 30);
+
+    if (!name) { setStatus("❌ Zid smiya dyal client"); return; }
+
+    const clients = loadClients();
+    clients.unshift({ name, start, duration, telegramSent:false });
+    saveClients(clients);
+
+    st.clientName.value = "";
+    st.startDate.value = "";
+    st.duration.value = 30;
+
+    render();
+    setStatus("✅ Client added");
+  });
+
+  $("btnCheck").addEventListener("click", async () => {
+    setStatus("⏳ Checking...");
+    try {
+      await checkAndNotify();
+    } catch (err) {
+      setStatus("❌ " + (err?.message || err));
+    }
+  });
+
+  $("btnSaveTg").addEventListener("click", () => {
+    const token = st.tgToken.value.trim();
+    const chatId = st.tgChatId.value.trim();
+    saveTg({ token, chatId });
+    setStatus("✅ Telegram saved in LocalStorage");
+  });
+
+  $("btnReset").addEventListener("click", () => {
+    if (!confirm("Reset ALL data?")) return;
+    localStorage.removeItem(LS_KEY);
+    render();
+    setStatus("✅ Reset done");
+  });
+
+  $("btnExport").addEventListener("click", () => {
+    const clients = loadClients();
+    const blob = new Blob([JSON.stringify(clients, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "clients_abonnements.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  $("btnImport").addEventListener("click", () => $("fileImport").click());
+  $("fileImport").addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try{
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!Array.isArray(data)) throw new Error("Invalid JSON");
+      // sanitize
+      const clients = data.map(x => ({
+        name: String(x.name || x.client || "Client").trim(),
+        start: String(x.start || x.dateDebut || todayISO()).slice(0,10),
+        duration: Number(x.duration || x.duree || 30),
+        telegramSent: !!x.telegramSent
+      }));
+      saveClients(clients);
+      render();
+      setStatus("✅ Imported");
+    }catch(err){
+      setStatus("❌ Import error: " + (err?.message || err));
+    } finally {
+      e.target.value = "";
+    }
+  });
+
+  // Init
+  const tg = loadTg();
+  if (tg.token) st.tgToken.value = tg.token;
+  if (tg.chatId) st.tgChatId.value = tg.chatId;
+
+  st.startDate.value = todayISO();
+  render();
+})();
+</script>
+</body>
+</html>
