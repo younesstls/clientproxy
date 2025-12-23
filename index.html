@@ -2,382 +2,601 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Abonnements Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abonnements Dashboard (KV + Worker)</title>
   <style>
     :root{
-      --bg1:#070b1a; --bg2:#0b1a2a;
-      --card:rgba(10,18,35,.72);
-      --stroke:rgba(255,255,255,.08);
-      --text:#e9f0ff; --muted:#a7b3cc;
-      --blue:#2f6bff; --blue2:#1b3aa7;
-      --green:#24c17a; --red:#ff4d4d; --amber:#ffb020;
-      --shadow: 0 18px 60px rgba(0,0,0,.35);
-      --r:16px;
+      --bg:#060a14;
+      --card:#0b1328cc;
+      --card2:#0b1328b3;
+      --stroke:#1b2a55;
+      --text:#e8eeff;
+      --muted:#93a3c7;
+      --ok:#2dd4bf;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --btn:#1d4ed8;
+      --btn2:#334155;
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --radius:18px;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, "Noto Sans", sans-serif;
       background:
-        radial-gradient(1000px 600px at 20% 10%, rgba(46,83,255,.25), transparent 60%),
-        radial-gradient(900px 600px at 80% 20%, rgba(0,255,170,.12), transparent 55%),
-        radial-gradient(900px 700px at 50% 110%, rgba(255,0,200,.10), transparent 60%),
-        linear-gradient(160deg,var(--bg1),var(--bg2));
-      min-height:100vh;
-      padding:24px;
-    }
-    .wrap{max-width:1100px;margin:0 auto}
-    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
-    h1{font-size:30px;margin:0;display:flex;align-items:center;gap:10px}
-    h1 .icon{font-size:28px}
-    .sub{color:var(--muted);margin-top:6px;font-size:13px}
-    .btns{display:flex;gap:10px;flex-wrap:wrap}
-    button{
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.06);
+        radial-gradient(1200px 600px at 25% 20%, rgba(29,78,216,.25), transparent 60%),
+        radial-gradient(900px 500px at 80% 75%, rgba(45,212,191,.18), transparent 60%),
+        radial-gradient(1000px 700px at 55% 105%, rgba(251,113,133,.12), transparent 60%),
+        var(--bg);
       color:var(--text);
-      padding:10px 14px;
-      border-radius:999px;
-      cursor:pointer;
-      box-shadow:none;
-      transition:.2s;
-      font-weight:600;
+      min-height:100vh;
+      padding:28px 18px 40px;
     }
-    button.primary{background:linear-gradient(180deg,var(--blue),var(--blue2));border:none}
-    button.danger{background:rgba(255,77,77,.12);border:1px solid rgba(255,77,77,.35)}
-    button:hover{transform:translateY(-1px);filter:brightness(1.03)}
-    button:disabled{opacity:.55;cursor:not-allowed;transform:none}
-    .grid4{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
+    .wrap{max-width:1120px;margin:0 auto}
+    .topbar{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
       gap:14px;
-      margin:14px 0 18px;
+      margin-bottom:16px;
+    }
+    .title{
+      display:flex; gap:12px; align-items:center;
+    }
+    .logo{
+      width:34px;height:34px;border-radius:10px;
+      background: linear-gradient(135deg, rgba(45,212,191,.9), rgba(29,78,216,.95));
+      box-shadow: 0 10px 35px rgba(0,0,0,.35);
+    }
+    h1{margin:0;font-size:26px;letter-spacing:.2px}
+    .subtitle{margin:4px 0 0;color:var(--muted);font-size:13px}
+    .actions{
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
+    }
+    button, .btn{
+      border:1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:13px;
+      transition:.15s transform, .15s opacity;
+      user-select:none;
+    }
+    button:hover{transform: translateY(-1px)}
+    button:active{transform: translateY(0px); opacity:.92}
+    .primary{
+      background: linear-gradient(180deg, rgba(29,78,216,.95), rgba(29,78,216,.75));
+      border-color: rgba(29,78,216,.55);
+    }
+    .danger{
+      background: linear-gradient(180deg, rgba(190,18,60,.85), rgba(190,18,60,.55));
+      border-color: rgba(190,18,60,.55);
+    }
+    .ghost{
+      background: linear-gradient(180deg, rgba(51,65,85,.65), rgba(51,65,85,.35));
+      border-color: rgba(51,65,85,.65);
+    }
+
+    .gridStats{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap:14px;
+      margin: 10px 0 14px;
     }
     .card{
-      background:var(--card);
+      background: linear-gradient(180deg, rgba(11,19,40,.82), rgba(11,19,40,.55));
       border:1px solid var(--stroke);
-      border-radius:var(--r);
-      box-shadow:var(--shadow);
-      padding:18px;
-      backdrop-filter: blur(8px);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:16px;
+      backdrop-filter: blur(10px);
     }
-    .stat .label{color:var(--muted);font-size:13px}
-    .stat .value{font-size:26px;font-weight:800;margin-top:6px}
-    .bigcard{padding:18px}
-    .sectionTitle{font-size:16px;font-weight:800;margin:0 0 10px}
-    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .stat .label{color:var(--muted); font-size:12px; margin-bottom:8px}
+    .stat .value{font-size:30px; font-weight:800; letter-spacing:.3px}
+    .stat small{color:var(--muted)}
+    .grid2{
+      display:grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap:14px;
+      margin-bottom:14px;
+    }
+    .card h2{
+      margin:0 0 14px;
+      font-size:16px;
+      letter-spacing:.2px;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
     .field{
-      flex:1;
-      min-width:220px;
       display:flex;
       flex-direction:column;
       gap:6px;
+      flex:1;
+      min-width: 210px;
     }
-    .field label{font-size:12px;color:var(--muted)}
-    input,select{
-      height:44px;
+    .field label{
+      color:var(--muted);
+      font-size:12px;
+    }
+    input, select, textarea{
+      background: rgba(3,7,18,.65);
+      border:1px solid var(--stroke);
+      color: var(--text);
+      padding:10px 12px;
       border-radius:12px;
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.05);
-      color:var(--text);
-      padding:0 12px;
       outline:none;
+      font-size:13px;
     }
-    input[type="number"]{max-width:160px}
-    .hint{font-size:12px;color:var(--muted);margin-left:auto}
+    input::placeholder{color:#7283ad}
+    input:focus, textarea:focus{
+      border-color: rgba(45,212,191,.45);
+      box-shadow: 0 0 0 3px rgba(45,212,191,.12);
+    }
+    .hint{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+      margin-top:10px;
+    }
+
+    .statusLine{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-top:10px;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .dot{width:10px;height:10px;border-radius:50%}
+    .dot.ok{background:var(--ok)}
+    .dot.warn{background:var(--warn)}
+    .dot.bad{background:var(--bad)}
     .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 12px;border-radius:999px;
+      padding:6px 10px;border-radius:999px;
       border:1px solid var(--stroke);
-      background:rgba(255,255,255,.04);
-      font-size:12px;color:var(--muted)
+      background: rgba(3,7,18,.45);
+      color:var(--text);
+      font-size:12px;
+      font-weight:700;
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
     }
-    .pill.ok{color:#bff5dd;border-color:rgba(36,193,122,.35);background:rgba(36,193,122,.10)}
-    .pill.bad{color:#ffd0d0;border-color:rgba(255,77,77,.35);background:rgba(255,77,77,.10)}
-    .warn{color:#ffe6b5}
-    table{width:100%;border-collapse:separate;border-spacing:0 10px;margin-top:10px}
-    th{color:var(--muted);font-size:12px;text-align:left;padding:0 10px}
-    td{
-      padding:12px 10px;
-      background:rgba(255,255,255,.04);
-      border-top:1px solid var(--stroke);
-      border-bottom:1px solid var(--stroke);
+    .pill.ok{border-color: rgba(45,212,191,.4); background: rgba(45,212,191,.10)}
+    .pill.bad{border-color: rgba(251,113,133,.4); background: rgba(251,113,133,.10)}
+    .pill.warn{border-color: rgba(251,191,36,.4); background: rgba(251,191,36,.10)}
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border-radius: var(--radius);
+      border:1px solid var(--stroke);
+      background: rgba(3,7,18,.35);
     }
-    td:first-child{border-left:1px solid var(--stroke);border-top-left-radius:12px;border-bottom-left-radius:12px}
-    td:last-child{border-right:1px solid var(--stroke);border-top-right-radius:12px;border-bottom-right-radius:12px}
-    .tag{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 12px;border-radius:999px;font-weight:700;font-size:12px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.05);
+    th, td{
+      padding:12px 12px;
+      border-bottom:1px solid rgba(27,42,85,.55);
+      vertical-align:middle;
+      font-size:13px;
     }
-    .tag.green{background:rgba(36,193,122,.12);border-color:rgba(36,193,122,.35)}
-    .tag.red{background:rgba(255,77,77,.12);border-color:rgba(255,77,77,.35)}
-    .actions{display:flex;gap:8px;flex-wrap:wrap}
-    .actions button{padding:9px 12px;border-radius:12px}
-    .actions .mini{background:rgba(255,255,255,.05)}
-    .actions .mini.green{background:rgba(36,193,122,.12);border-color:rgba(36,193,122,.35)}
-    .actions .mini.red{background:rgba(255,77,77,.12);border-color:rgba(255,77,77,.35)}
-    .footer{color:var(--muted);text-align:center;margin-top:12px;font-size:12px}
+    th{
+      text-align:left;
+      color: var(--muted);
+      font-size:12px;
+      background: rgba(11,19,40,.55);
+    }
+    tr:last-child td{border-bottom:0}
+    .nameCell{font-weight:800}
+    .tdRight{text-align:right}
+    .btnSmall{
+      padding:8px 10px;
+      border-radius:12px;
+      font-size:12px;
+      font-weight:800;
+    }
+    .btnGroup{display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap}
+    .footer{
+      text-align:center;
+      margin-top:12px;
+      color: var(--muted);
+      font-size:12px;
+    }
+
+    .toastWrap{
+      position:fixed;
+      left:0; right:0;
+      bottom:18px;
+      display:flex;
+      justify-content:center;
+      pointer-events:none;
+      padding:0 10px;
+      z-index:99;
+    }
     .toast{
-      position:fixed;left:50%;bottom:20px;transform:translateX(-50%);
-      padding:12px 14px;border-radius:12px;border:1px solid var(--stroke);
-      background:rgba(10,18,35,.85);backdrop-filter:blur(10px);
-      box-shadow:var(--shadow);display:none;gap:10px;align-items:center;max-width:92vw;
-      z-index:9999;
+      pointer-events:none;
+      max-width:900px;
+      width: fit-content;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(3,7,18,.75);
+      box-shadow: var(--shadow);
+      color: var(--text);
+      font-weight:700;
+      font-size:13px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      opacity:0;
+      transform: translateY(10px);
+      transition: .22s ease;
+      white-space: pre-wrap;
     }
-    .toast.show{display:flex}
-    .toast .dot{width:10px;height:10px;border-radius:50%}
-    .dot.ok{background:var(--green)}
-    .dot.bad{background:var(--red)}
-    .dot.warn{background:var(--amber)}
-    .toast .msg{font-size:13px;color:var(--text)}
+    .toast.show{opacity:1; transform: translateY(0px)}
+    .toast .tDot{width:9px;height:9px;border-radius:50%}
+    .toast .tDot.ok{background:var(--ok)}
+    .toast .tDot.warn{background:var(--warn)}
+    .toast .tDot.bad{background:var(--bad)}
+
+    @media (max-width: 980px){
+      .gridStats{grid-template-columns: repeat(2, minmax(0,1fr))}
+      .grid2{grid-template-columns: 1fr}
+      .actions{justify-content:flex-start}
+    }
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="topbar">
+<div class="wrap">
+  <div class="topbar">
+    <div class="title">
+      <div class="logo"></div>
       <div>
-        <h1><span class="icon">📊</span> Abonnements Dashboard</h1>
-        <div class="sub">Clients • Date fin auto • Jours restants • Notifications Telegram (via Worker)</div>
-      </div>
-      <div class="btns">
-        <button id="exportBtn" class="primary">Export JSON</button>
-        <button id="importBtn">Import JSON</button>
-        <button id="resetBtn" class="danger">Reset</button>
-        <input id="importFile" type="file" accept="application/json" style="display:none" />
+        <h1>Abonnements Dashboard</h1>
+        <div class="subtitle">Clients • Date fin auto • Jours restants • Notifications Telegram (via Worker)</div>
       </div>
     </div>
 
-    <div class="grid4">
-      <div class="card stat">
-        <div class="label">Total</div>
-        <div class="value" id="sTotal">0</div>
-      </div>
-      <div class="card stat">
-        <div class="label">Actifs</div>
-        <div class="value" id="sActive">0</div>
-      </div>
-      <div class="card stat">
-        <div class="label">Expire bientôt</div>
-        <div class="value" id="sSoon">0</div>
-      </div>
-      <div class="card stat">
-        <div class="label">Expirés</div>
-        <div class="value" id="sExpired">0</div>
-      </div>
+    <div class="actions">
+      <button class="primary" id="btnExport">Export JSON</button>
+      <button class="ghost" id="btnImport">Import JSON</button>
+      <button class="danger" id="btnReset">Reset</button>
     </div>
+  </div>
 
-    <div class="card bigcard">
-      <div class="sectionTitle">Cloudflare Worker (API)</div>
+  <div class="gridStats">
+    <div class="card stat">
+      <div class="label">Total</div>
+      <div class="value" id="statTotal">0</div>
+    </div>
+    <div class="card stat">
+      <div class="label">Actifs</div>
+      <div class="value" id="statActive">0</div>
+    </div>
+    <div class="card stat">
+      <div class="label">Expire bientôt</div>
+      <div class="value" id="statSoon">0</div>
+      <small>(≤ seuil)</small>
+    </div>
+    <div class="card stat">
+      <div class="label">Expirés</div>
+      <div class="value" id="statExpired">0</div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Cloudflare Worker (API)</h2>
       <div class="row">
-        <div class="field" style="min-width:420px">
+        <div class="field" style="flex:1.4;min-width:260px;">
           <label>Worker Base URL</label>
-          <input id="workerBase" placeholder="https://xxxx.workers.dev" />
+          <input id="workerBase" placeholder="https://xxxx.yourname.workers.dev" />
         </div>
-        <div class="field" style="max-width:200px">
+        <div class="field" style="max-width:220px;">
           <label>Notifier si jours ≤</label>
           <input id="thresholdDays" type="number" min="0" step="1" />
         </div>
-        <button id="loadCloudBtn">Load (Cloud)</button>
-        <button id="saveCloudBtn">Save (Cloud)</button>
-        <button id="checkNotifyBtn" class="primary">Check & Notify</button>
-        <div class="hint">
-          ⚠️ Les secrets Telegram (BOT_TOKEN / CHAT_ID) كاينين ف Worker.
+        <div class="row" style="gap:8px; margin-top:18px;">
+          <button class="ghost btnSmall" id="btnLoadCloud">Load (Cloud)</button>
+          <button class="ghost btnSmall" id="btnSaveCloud">Save (Cloud)</button>
+          <button class="primary btnSmall" id="btnCheckNotify">Check & Notify</button>
         </div>
       </div>
-      <div style="margin-top:10px">
-        <span class="pill" id="cloudStatus"><span class="dot warn"></span><span>Ready</span></span>
+
+      <div class="statusLine">
+        <span class="dot" id="apiDot"></span>
+        <span id="apiStatus">Ready</span>
+        <span style="margin-left:auto" class="hint">⚠️ Il faut KV binding <b>CLIENTS_KV</b> + secrets <b>BOT_TOKEN</b> & <b>CHAT_ID</b> dans le Worker.</span>
       </div>
     </div>
 
-    <div class="card bigcard">
-      <div class="sectionTitle">Ajouter / Modifier un client</div>
+    <div class="card">
+      <h2>Ajouter / Modifier un client</h2>
       <div class="row">
-        <div class="field" style="min-width:340px">
+        <div class="field" style="flex:1.2;min-width:260px;">
           <label>Client (nom)</label>
-          <input id="cName" placeholder="ex: houssa group 200 proxy 1500dh" />
+          <input id="clientName" placeholder="ex: houssa group 200 proxy 1500dh" />
         </div>
-        <div class="field" style="max-width:220px">
+      </div>
+      <div class="row">
+        <div class="field">
           <label>Début</label>
-          <input id="cStart" type="date" />
+          <input id="startDate" type="date" />
         </div>
-        <div class="field" style="max-width:220px">
+        <div class="field">
           <label>Durée (jours)</label>
-          <input id="cDays" type="number" min="1" step="1" value="30" />
+          <input id="durationDays" type="number" min="1" step="1" value="30" />
         </div>
-        <button id="addBtn" class="primary">+ Add Client</button>
+        <div class="row" style="gap:8px; margin-top:22px;">
+          <button class="primary" id="btnAddUpdate">+ Add Client</button>
+          <button class="ghost" id="btnCancelEdit" style="display:none;">Cancel</button>
+        </div>
       </div>
-      <div class="sub" style="margin-top:8px">
-        ➜ Fin = Début + Durée. Actions: Renew, Disable/Enable, Delete.
-      </div>
+      <div class="hint">📌 Fin = Début + Durée. Tu peux gérer local (LocalStorage) ou cloud (KV via Worker).</div>
     </div>
+  </div>
 
-    <div class="card bigcard">
+  <div class="card">
+    <h2>Clients</h2>
+    <div style="overflow:auto;">
       <table>
         <thead>
           <tr>
-            <th>Client</th>
+            <th style="min-width:220px;">Client</th>
             <th>Début</th>
             <th>Durée</th>
             <th>Fin</th>
             <th>Jours restants</th>
             <th>Statut</th>
             <th>TelegramSent</th>
-            <th>Actions</th>
+            <th class="tdRight">Actions</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
       </table>
-      <div class="footer">by.bestfriend • KV + Worker • GitHub Pages</div>
     </div>
+    <div class="footer">by.bestfriend • KV + Worker • GitHub Pages</div>
   </div>
+</div>
 
+<div class="toastWrap">
   <div class="toast" id="toast">
-    <div class="dot warn" id="toastDot"></div>
-    <div class="msg" id="toastMsg"></div>
+    <span class="tDot ok" id="toastDot"></span>
+    <span id="toastText"></span>
   </div>
+</div>
+
+<input id="importFile" type="file" accept="application/json" style="display:none" />
 
 <script>
-(() => {
-  const LS_KEY = "abonnements_state_v2";
+  // =========================
+  //  Abonnements Dashboard
+  //  - LocalStorage (device)
+  //  - Cloud (KV via Worker API)
+  //
+  //  IMPORTANT:
+  //  - Local is per device/browser.
+  //  - Cloud is shared (PC + phone) after Save(Cloud) and Load(Cloud).
+  // =========================
+
+  const LS_KEY = "abonnements_dashboard_v2";
+
   const $ = (id) => document.getElementById(id);
 
   const state = {
+    editingId: null,
     data: {
       workerBase: "",
       thresholdDays: 2,
       clients: []
-    },
-    editId: null
-  };
-
-  const todayISO = () => {
-    const d = new Date();
-    const pad = (n) => String(n).padStart(2,"0");
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  };
-
-  const addDays = (iso, days) => {
-    const d = new Date(iso + "T00:00:00Z");
-    d.setUTCDate(d.getUTCDate() + Number(days || 0));
-    return d.toISOString().slice(0,10);
-  };
-
-  const daysBetween = (fromISO, toISO) => {
-    const a = new Date(fromISO + "T00:00:00Z").getTime();
-    const b = new Date(toISO + "T00:00:00Z").getTime();
-    return Math.ceil((b - a) / 86400000);
-  };
-
-  const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
-
-  const toast = (msg, type="warn") => {
-    const t = $("toast");
-    $("toastMsg").textContent = msg;
-    $("toastDot").className = "dot " + (type === "ok" ? "ok" : type === "bad" ? "bad" : "warn");
-    t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 2600);
-  };
-
-  const setCloudStatus = (text, type="warn") => {
-    const pill = $("cloudStatus");
-    pill.className = "pill " + (type === "ok" ? "ok" : type === "bad" ? "bad" : "");
-    pill.innerHTML = `<span class="dot ${type}"></span><span>${text}</span>`;
-  };
-
-  const saveLocal = () => localStorage.setItem(LS_KEY, JSON.stringify(state.data));
-  const loadLocal = () => {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return;
-    try {
-      const obj = JSON.parse(raw);
-      if (obj && typeof obj === "object") state.data = { ...state.data, ...obj };
-    } catch {}
-  };
-
-  const api = (path) => {
-    const base = (state.data.workerBase || "").replace(/\/+$/,"");
-    return base + path;
-  };
-
-  async function apiFetch(path, opts = {}) {
-    const url = api(path);
-    const r = await fetch(url, {
-      ...opts,
-      headers: { "Content-Type":"application/json", ...(opts.headers || {}) },
-    });
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) {
-      const msg = (data && (data.error || data.message)) ? (data.error || data.message) : `HTTP ${r.status}`;
-      throw new Error(msg);
     }
-    return data;
+  };
+
+  // ---------- Utils ----------
+  function uid(){
+    return Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
+  }
+  function isoDate(d){
+    const x = new Date(d);
+    const y = x.getFullYear();
+    const m = String(x.getMonth()+1).padStart(2,"0");
+    const day = String(x.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+  }
+  function addDays(dateStr, days){
+    const d = new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() + Number(days || 0));
+    return isoDate(d);
+  }
+  function diffDaysFromToday(endStr){
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // local midnight
+    const end = new Date(endStr + "T00:00:00");
+    const ms = end - today;
+    return Math.ceil(ms / 86400000);
+  }
+  function safeNum(n, fallback){
+    const x = Number(n);
+    return Number.isFinite(x) ? x : fallback;
   }
 
-  const stats = () => {
-    const threshold = Number(state.data.thresholdDays || 0);
-    const t = todayISO();
-    const list = state.data.clients || [];
-    let total = list.length;
-    let active = 0, soon = 0, expired = 0;
-    for (const c of list) {
-      const isActive = c.active !== false;
-      if (isActive) active++;
-      const d = daysBetween(t, c.end);
-      if (d < 0) expired++;
-      else if (d <= threshold && isActive) soon++;
+  // ---------- Toast ----------
+  let toastTimer = null;
+  function toast(msg, kind="ok"){
+    $("toastText").textContent = msg;
+    const dot = $("toastDot");
+    dot.className = "tDot " + (kind === "bad" ? "bad" : (kind === "warn" ? "warn" : "ok"));
+    const t = $("toast");
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>t.classList.remove("show"), 2200);
+  }
+
+  // ---------- Storage ----------
+  function loadLocal(){
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw) return;
+      const obj = JSON.parse(raw);
+      if(obj && typeof obj === "object"){
+        // merge
+        state.data.workerBase = obj.workerBase || state.data.workerBase;
+        state.data.thresholdDays = safeNum(obj.thresholdDays, 2);
+        state.data.clients = Array.isArray(obj.clients) ? obj.clients : [];
+      }
+    }catch(e){
+      console.warn(e);
     }
-    $("sTotal").textContent = total;
-    $("sActive").textContent = active;
-    $("sSoon").textContent = soon;
-    $("sExpired").textContent = expired;
-  };
+  }
+  function saveLocal(){
+    localStorage.setItem(LS_KEY, JSON.stringify(state.data));
+  }
 
-  const render = () => {
-    stats();
-    const t = todayISO();
-    const tbody = $("tbody");
-    tbody.innerHTML = "";
-    const threshold = Number(state.data.thresholdDays || 0);
+  // ---------- API ----------
+  function normBase(base){
+    base = (base || "").trim();
+    if(!base) return "";
+    // remove trailing slash
+    return base.replace(/\/+$/,"");
+  }
 
-    const sorted = [...(state.data.clients || [])].sort((a,b) => a.end.localeCompare(b.end));
+  async function apiFetch(path, options={}){
+    const base = normBase(state.data.workerBase || $("workerBase").value);
+    if(!base) throw new Error("Worker Base URL missing");
+    const url = base + path;
+    const res = await fetch(url, {
+      method: options.method || "GET",
+      headers: Object.assign({"Content-Type":"application/json"}, options.headers||{}),
+      body: options.body ? JSON.stringify(options.body) : undefined
+    });
+    const text = await res.text();
+    let json;
+    try{ json = text ? JSON.parse(text) : {}; } catch { json = { raw:text }; }
+    if(!res.ok){
+      const err = (json && (json.error || json.message)) ? (json.error || json.message) : ("HTTP " + res.status);
+      throw new Error(err);
+    }
+    return json;
+  }
 
-    for (const c of sorted) {
-      const remain = daysBetween(t, c.end);
-      const statusTag = c.active === false
-        ? `<span class="tag red">Disabled</span>`
-        : `<span class="tag green">Actif</span>`;
+  async function pingWorker(){
+    try{
+      const out = await apiFetch("/api/check", {method:"GET"});
+      setApiStatus(true, out && out.ok ? "Worker OK ✅" : "Worker up");
+      return true;
+    }catch(e){
+      setApiStatus(false, "Check failed ❌ " + e.message);
+      return false;
+    }
+  }
 
-      const remainTxt = remain < 0 ? `${remain} j` : `${remain} j`;
-      const soonWarn = (remain >= 0 && remain <= threshold && c.active !== false) ? " ⚠️" : "";
+  function setApiStatus(ok, msg){
+    $("apiStatus").textContent = msg;
+    const dot = $("apiDot");
+    dot.className = "dot " + (ok ? "ok" : "bad");
+  }
+
+  // ---------- Render / Stats ----------
+  function computeClientRow(c){
+    const start = c.start || isoDate(new Date());
+    const duration = safeNum(c.duration, 30);
+    const end = c.end || addDays(start, duration);
+    const daysLeft = diffDaysFromToday(end);
+    const active = c.active !== false;
+    const expired = daysLeft < 0;
+    const soon = !expired && daysLeft <= state.data.thresholdDays;
+
+    return { start, duration, end, daysLeft, active, expired, soon };
+  }
+
+  function render(){
+    // ensure ids + computed end
+    state.data.clients = (state.data.clients || []).map(c=>{
+      if(!c.id) c.id = uid();
+      const start = c.start || isoDate(new Date());
+      const duration = safeNum(c.duration, 30);
+      const end = c.end || addDays(start, duration);
+      return { ...c, start, duration, end };
+    });
+
+    // stats
+    const total = state.data.clients.length;
+    const actives = state.data.clients.filter(c => c.active !== false).length;
+    let soon = 0, expired = 0;
+    for(const c of state.data.clients){
+      const r = computeClientRow(c);
+      if(r.expired) expired++;
+      if(r.soon && r.active) soon++;
+    }
+
+    $("statTotal").textContent = total;
+    $("statActive").textContent = actives;
+    $("statSoon").textContent = soon;
+    $("statExpired").textContent = expired;
+
+    // table
+    const tb = $("tbody");
+    tb.innerHTML = "";
+    if(!total){
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="8" style />, colspan="8" style="color:var(--muted); padding:18px;">Aucun client.</td>`;
+      tb.appendChild(tr);
+      return;
+    }
+
+    // sort by end date ascending
+    const clientsSorted = [...state.data.clients].sort((a,b)=>{
+      const aa = a.end || "";
+      const bb = b.end || "";
+      return aa.localeCompare(bb);
+    });
+
+    for(const c of clientsSorted){
+      const r = computeClientRow(c);
+
+      let pill = `<span class="pill ok"><span class="dot ok"></span>Actif</span>`;
+      if(!r.active) pill = `<span class="pill"><span class="dot warn"></span>Désactivé</span>`;
+      else if(r.expired) pill = `<span class="pill bad"><span class="dot bad"></span>Expiré</span>`;
+      else if(r.soon) pill = `<span class="pill warn"><span class="dot warn"></span>Expire bientôt</span>`;
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td><b>${escapeHtml(c.name || "")}</b></td>
-        <td>${c.start}</td>
-        <td>${c.days} j</td>
-        <td>${c.end}</td>
-        <td><b>${remainTxt}</b>${soonWarn}</td>
-        <td>${statusTag}</td>
-        <td>${c.telegramSentAt ? escapeHtml(c.telegramSentAt) : "—"}</td>
-        <td>
-          <div class="actions">
-            <button class="mini green" data-act="renew" data-id="${c.id}">Renew +30</button>
-            <button class="mini" data-act="edit" data-id="${c.id}">Edit</button>
-            <button class="mini" data-act="toggle" data-id="${c.id}">${c.active === false ? "Enable" : "Disable"}</button>
-            <button class="mini red" data-act="del" data-id="${c.id}">Delete</button>
+        <td class="nameCell">${escapeHtml(c.name || "Client")}</td>
+        <td>${escapeHtml(r.start)}</td>
+        <td>${escapeHtml(String(r.duration))} j</td>
+        <td>${escapeHtml(r.end)}</td>
+        <td><b>${r.daysLeft}</b> jour${Math.abs(r.daysLeft)===1?"":"s"}</td>
+        <td>${pill}</td>
+        <td style="color:var(--muted)">${escapeHtml(c.telegramSentAt || "—")}</td>
+        <td class="tdRight">
+          <div class="btnGroup">
+            <button class="ghost btnSmall" data-act="renew" data-id="${c.id}">Renew +30</button>
+            <button class="ghost btnSmall" data-act="edit" data-id="${c.id}">Edit</button>
+            <button class="ghost btnSmall" data-act="toggle" data-id="${c.id}">${r.active ? "Disable" : "Enable"}</button>
+            <button class="danger btnSmall" data-act="del" data-id="${c.id}">Delete</button>
           </div>
         </td>
       `;
-      tbody.appendChild(tr);
+      tb.appendChild(tr);
     }
-  };
+
+    // persist UI fields
+    $("workerBase").value = state.data.workerBase || "";
+    $("thresholdDays").value = String(state.data.thresholdDays ?? 2);
+  }
 
   function escapeHtml(s){
-    return String(s)
+    return String(s ?? "")
       .replaceAll("&","&amp;")
       .replaceAll("<","&lt;")
       .replaceAll(">","&gt;")
@@ -385,213 +604,308 @@
       .replaceAll("'","&#039;");
   }
 
+  // ---------- Form ----------
   function resetForm(){
-    state.editId = null;
-    $("cName").value = "";
-    $("cStart").value = todayISO();
-    $("cDays").value = 30;
-    $("addBtn").textContent = "+ Add Client";
+    state.editingId = null;
+    $("clientName").value = "";
+    $("durationDays").value = "30";
+    $("btnAddUpdate").textContent = "+ Add Client";
+    $("btnCancelEdit").style.display = "none";
   }
 
-  function upsertClient(){
-    const name = $("cName").value.trim();
-    const start = $("cStart").value || todayISO();
-    const days = Number($("cDays").value || 30);
-    if (!name) return toast("Client name required", "bad");
-    if (!days || days < 1) return toast("Durée invalid", "bad");
+  function fillFormForEdit(client){
+    state.editingId = client.id;
+    $("clientName").value = client.name || "";
+    $("startDate").value = client.start || isoDate(new Date());
+    $("durationDays").value = String(client.duration || 30);
+    $("btnAddUpdate").textContent = "Update Client";
+    $("btnCancelEdit").style.display = "inline-block";
+  }
 
-    const end = addDays(start, days);
+  function addOrUpdateClient(){
+    const name = $("clientName").value.trim();
+    const start = $("startDate").value || isoDate(new Date());
+    const duration = safeNum($("durationDays").value, 30);
 
-    if (state.editId) {
-      const idx = state.data.clients.findIndex(x => x.id === state.editId);
-      if (idx >= 0) {
-        state.data.clients[idx] = { ...state.data.clients[idx], name, start, days, end };
+    if(!name){
+      toast("Client name required ❌", "bad");
+      return;
+    }
+    if(duration <= 0){
+      toast("Duration must be > 0 ❌", "bad");
+      return;
+    }
+
+    const end = addDays(start, duration);
+
+    if(state.editingId){
+      const idx = state.data.clients.findIndex(x => x.id === state.editingId);
+      if(idx >= 0){
+        state.data.clients[idx] = {
+          ...state.data.clients[idx],
+          name, start, duration, end
+        };
+        toast("Client updated ✅", "ok");
       }
-      toast("Client updated ✅", "ok");
-    } else {
-      state.data.clients.push({ id: uid(), name, start, days, end, active: true });
+    }else{
+      state.data.clients.push({
+        id: uid(),
+        name,
+        start,
+        duration,
+        end,
+        active: true,
+        telegramSentAt: ""
+      });
       toast("Client added ✅", "ok");
     }
 
     saveLocal();
-    resetForm();
     render();
+    resetForm();
   }
 
-  async function loadCloud(){
-    try {
-      setCloudStatus("Loading cloud…", "warn");
-      const out = await apiFetch("/api/clients", { method:"GET" });
-      const data = out.data || { thresholdDays: 2, clients: [] };
-      state.data.thresholdDays = Number(data.thresholdDays ?? 2);
-      state.data.clients = Array.isArray(data.clients) ? data.clients : [];
-      $("thresholdDays").value = state.data.thresholdDays;
+  // ---------- Export/Import ----------
+  function exportJSON(){
+    const blob = new Blob([JSON.stringify(state.data, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "abonnements-dashboard.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast("Export ready ✅");
+  }
+
+  function importJSONFile(file){
+    const r = new FileReader();
+    r.onload = () => {
+      try{
+        const obj = JSON.parse(String(r.result||""));
+        if(!obj || typeof obj !== "object") throw new Error("Invalid JSON");
+        // accept either full state or only {clients, thresholdDays}
+        if(Array.isArray(obj.clients)){
+          state.data.clients = obj.clients;
+        }
+        if(obj.thresholdDays != null) state.data.thresholdDays = safeNum(obj.thresholdDays, 2);
+        if(obj.workerBase) state.data.workerBase = String(obj.workerBase);
+        // ensure
+        saveLocal();
+        render();
+        toast("Imported ✅");
+      }catch(e){
+        toast("Import failed ❌ " + e.message, "bad");
+      }
+    };
+    r.readAsText(file);
+  }
+
+  function resetAll(){
+    if(!confirm("Reset local data? (LocalStorage)")) return;
+    state.data.clients = [];
+    state.data.thresholdDays = 2;
+    // keep workerBase (optional)
+    saveLocal();
+    render();
+    resetForm();
+    toast("Reset done ✅");
+  }
+
+  // ---------- Cloud Load/Save ----------
+  async function loadFromCloud(){
+    $("apiDot").className = "dot warn";
+    $("apiStatus").textContent = "Loading cloud...";
+    try{
+      // ping first (optional)
+      await pingWorker();
+
+      const out = await apiFetch("/api/clients", {method:"GET"});
+      const data = out && out.data ? out.data : null;
+
+      if(!data || !Array.isArray(data.clients)){
+        setApiStatus(false, "Cloud response invalid ❌");
+        toast("Cloud response invalid ❌", "bad");
+        return;
+      }
+
+      // ✅ IMPORTANT: do NOT wipe local if cloud empty
+      if(data.clients.length === 0){
+        setApiStatus(true, "Cloud is empty — keeping local ✅");
+        toast("Cloud empty — local kept ✅", "warn");
+        return;
+      }
+
+      state.data.thresholdDays = safeNum(data.thresholdDays, state.data.thresholdDays ?? 2);
+      state.data.clients = data.clients;
+
       saveLocal();
       render();
-      setCloudStatus("Cloud loaded ✅", "ok");
-      toast("Cloud loaded ✅", "ok");
-    } catch (e) {
-      setCloudStatus("Load cloud failed ❌", "bad");
-      toast("Load failed: " + (e.message || e), "bad");
+      setApiStatus(true, "Cloud loaded ✅");
+      toast("Cloud loaded ✅");
+    }catch(e){
+      setApiStatus(false, "Load cloud failed ❌ " + e.message);
+      toast("Load cloud failed ❌ " + e.message, "bad");
     }
   }
 
-  async function saveCloud(){
-    try {
-      setCloudStatus("Saving cloud…", "warn");
-      const body = { thresholdDays: Number(state.data.thresholdDays||2), clients: state.data.clients || [] };
-      await apiFetch("/api/clients", { method:"POST", body: JSON.stringify(body) });
-      setCloudStatus("Saved ✅", "ok");
-      toast("Saved to cloud ✅", "ok");
-    } catch (e) {
-      setCloudStatus("Save cloud failed ❌", "bad");
-      toast("Save failed: " + (e.message || e), "bad");
+  async function saveToCloud(){
+    $("apiDot").className = "dot warn";
+    $("apiStatus").textContent = "Saving cloud...";
+    try{
+      await pingWorker();
+
+      const payload = {
+        thresholdDays: safeNum(state.data.thresholdDays, 2),
+        clients: state.data.clients
+      };
+      await apiFetch("/api/clients", {method:"POST", body: payload});
+
+      setApiStatus(true, "Saved to cloud ✅");
+      toast("Saved to cloud ✅");
+    }catch(e){
+      setApiStatus(false, "Save cloud failed ❌ " + e.message);
+      toast("Save cloud failed ❌ " + e.message, "bad");
     }
   }
 
+  // ---------- Check & Notify ----------
   async function checkAndNotify(){
-    try {
-      const threshold = Number(state.data.thresholdDays || 2);
-      const t = todayISO();
-      const expiring = (state.data.clients || [])
-        .filter(c => c && c.active !== false)
-        .map(c => ({ c, d: daysBetween(t, c.end) }))
-        .filter(x => x.d >= 0 && x.d <= threshold);
+    try{
+      const threshold = safeNum(state.data.thresholdDays, 2);
 
-      if (!expiring.length) {
-        toast(`No expiring clients ✅ (≤ ${threshold} days)`, "ok");
+      // find expiring
+      const expiring = [];
+      for(const c of state.data.clients){
+        const r = computeClientRow(c);
+        if(r.active && r.daysLeft <= threshold && r.daysLeft >= 0){
+          expiring.push({ c, r });
+        }
+      }
+
+      if(!expiring.length){
+        toast(`No expiring clients ✅ (≤ ${threshold} days)`);
         return;
       }
 
       const lines = expiring
-        .map(x => `• ${x.c.name} → باقي ${x.d} يوم (النهاية: ${x.c.end})`)
+        .map(x => `• ${x.c.name} → باقي ${x.r.daysLeft} يوم (النهاية: ${x.r.end})`)
         .join("\n");
 
       const text = `⚠️ Expiration قريب (≤ ${threshold} أيام)\n\n${lines}`;
 
-      const r = await apiFetch("/api/notify", {
-        method:"POST",
-        body: JSON.stringify({ message: text })
-      });
+      // call worker notify
+      await pingWorker();
+      const r = await apiFetch("/api/notify", {method:"POST", body:{message:text}});
 
+      // mark telegramSentAt locally for those clients
       const sentAt = new Date().toISOString().slice(0,19).replace("T"," ");
-      for (const x of expiring) x.c.telegramSentAt = sentAt;
+      for(const x of expiring){
+        x.c.telegramSentAt = sentAt;
+      }
 
       saveLocal();
       render();
-      toast("Telegram sent ✅", "ok");
-      setCloudStatus("Notified ✅", "ok");
-    } catch (e) {
-      toast("Check & Notify failed ❌: " + (e.message || e), "bad");
-      setCloudStatus("Notify failed ❌", "bad");
+
+      toast(r && r.ok ? "Telegram sent ✅" : "Check response", r && r.ok ? "ok" : "warn");
+    }catch(e){
+      console.error(e);
+      toast("Check & Notify failed ❌ " + (e.message || String(e)), "bad");
     }
   }
 
-  // events
-  $("addBtn").addEventListener("click", upsertClient);
+  // ---------- Events ----------
+  function init(){
+    // default date
+    $("startDate").value = isoDate(new Date());
 
-  $("tbody").addEventListener("click", (ev) => {
-    const btn = ev.target.closest("button");
-    if (!btn) return;
-    const id = btn.getAttribute("data-id");
-    const act = btn.getAttribute("data-act");
-    const idx = state.data.clients.findIndex(x => x.id === id);
-    if (idx < 0) return;
-    const c = state.data.clients[idx];
+    // load local state
+    loadLocal();
 
-    if (act === "renew") {
-      c.days = Number(c.days || 30) + 30;
-      c.end = addDays(c.start, c.days);
-      toast("Renew +30 ✅", "ok");
-      saveLocal(); render();
-    }
-    if (act === "edit") {
-      state.editId = c.id;
-      $("cName").value = c.name;
-      $("cStart").value = c.start;
-      $("cDays").value = c.days;
-      $("addBtn").textContent = "Save changes";
-      window.scrollTo({ top: 0, behavior:"smooth" });
-    }
-    if (act === "toggle") {
-      c.active = c.active === false ? true : false;
-      toast(c.active ? "Enabled ✅" : "Disabled ✅", "ok");
-      saveLocal(); render();
-    }
-    if (act === "del") {
-      state.data.clients.splice(idx,1);
-      toast("Deleted ✅", "ok");
-      saveLocal(); render();
-    }
-  });
+    // ensure defaults
+    state.data.thresholdDays = safeNum(state.data.thresholdDays, 2);
+    state.data.clients = Array.isArray(state.data.clients) ? state.data.clients : [];
+    state.data.workerBase = state.data.workerBase || "";
 
-  $("loadCloudBtn").addEventListener("click", loadCloud);
-  $("saveCloudBtn").addEventListener("click", saveCloud);
-  $("checkNotifyBtn").addEventListener("click", checkAndNotify);
+    // write inputs
+    $("workerBase").value = state.data.workerBase || "";
+    $("thresholdDays").value = String(state.data.thresholdDays ?? 2);
 
-  $("workerBase").addEventListener("change", () => {
-    state.data.workerBase = $("workerBase").value.trim();
-    saveLocal();
-  });
-
-  $("thresholdDays").addEventListener("change", () => {
-    state.data.thresholdDays = Number($("thresholdDays").value || 2);
-    saveLocal();
+    // render
     render();
-  });
 
-  $("exportBtn").addEventListener("click", () => {
-    const blob = new Blob([JSON.stringify(state.data, null, 2)], { type:"application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "abonnements_export.json";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  });
+    // ping when base present
+    if(state.data.workerBase){
+      pingWorker();
+    }else{
+      setApiStatus(true, "Ready");
+    }
 
-  $("importBtn").addEventListener("click", () => $("importFile").click());
-  $("importFile").addEventListener("change", async () => {
-    const f = $("importFile").files?.[0];
-    if (!f) return;
-    try {
-      const txt = await f.text();
-      const obj = JSON.parse(txt);
-      if (!obj || typeof obj !== "object") throw new Error("Invalid JSON");
-      state.data = { ...state.data, ...obj };
+    // inputs persist
+    $("workerBase").addEventListener("change", ()=>{
+      state.data.workerBase = $("workerBase").value.trim();
+      saveLocal();
+      pingWorker();
+    });
+    $("thresholdDays").addEventListener("change", ()=>{
+      state.data.thresholdDays = safeNum($("thresholdDays").value, 2);
       saveLocal();
       render();
-      toast("Imported ✅", "ok");
-    } catch (e) {
-      toast("Import failed ❌", "bad");
-    } finally {
-      $("importFile").value = "";
-    }
-  });
+    });
 
-  $("resetBtn").addEventListener("click", () => {
-    if (!confirm("Reset local data?")) return;
-    localStorage.removeItem(LS_KEY);
-    state.data = { workerBase:"", thresholdDays: 2, clients: [] };
-    resetForm();
-    render();
-    $("workerBase").value = "";
-    $("thresholdDays").value = 2;
-    setCloudStatus("Ready", "warn");
-    toast("Reset ✅", "ok");
-  });
+    // buttons
+    $("btnAddUpdate").addEventListener("click", addOrUpdateClient);
+    $("btnCancelEdit").addEventListener("click", ()=>{
+      resetForm();
+      toast("Edit canceled");
+    });
 
-  // init
-  loadLocal();
-  $("workerBase").value = state.data.workerBase || "https://empty-wood-8ebe.youness-moumine-filali.workers.dev";
-  $("thresholdDays").value = Number(state.data.thresholdDays || 2);
-  $("cStart").value = todayISO();
-  if (!state.data.workerBase) state.data.workerBase = $("workerBase").value.trim();
-  // ensure ids
-  state.data.clients = (state.data.clients || []).map(c => ({ id: c.id || uid(), ...c }));
-  saveLocal();
-  resetForm();
-  render();
-})();
+    $("btnExport").addEventListener("click", exportJSON);
+    $("btnImport").addEventListener("click", ()=> $("importFile").click());
+    $("importFile").addEventListener("change", (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(file) importJSONFile(file);
+      e.target.value = "";
+    });
+    $("btnReset").addEventListener("click", resetAll);
+
+    $("btnLoadCloud").addEventListener("click", loadFromCloud);
+    $("btnSaveCloud").addEventListener("click", saveToCloud);
+    $("btnCheckNotify").addEventListener("click", checkAndNotify);
+
+    // table actions
+    $("tbody").addEventListener("click", (e)=>{
+      const btn = e.target.closest("button");
+      if(!btn) return;
+      const act = btn.dataset.act;
+      const id = btn.dataset.id;
+      const idx = state.data.clients.findIndex(x=>x.id===id);
+      if(idx < 0) return;
+      const c = state.data.clients[idx];
+
+      if(act === "renew"){
+        c.duration = safeNum(c.duration, 30) + 30;
+        c.end = addDays(c.start, c.duration);
+        saveLocal(); render();
+        toast("Renew +30 ✅");
+      }
+      if(act === "edit"){
+        fillFormForEdit(c);
+        toast("Editing…", "warn");
+      }
+      if(act === "toggle"){
+        c.active = !(c.active !== false); // toggle
+        saveLocal(); render();
+        toast(c.active ? "Enabled ✅" : "Disabled ✅", "ok");
+      }
+      if(act === "del"){
+        if(!confirm("Delete this client?")) return;
+        state.data.clients.splice(idx,1);
+        saveLocal(); render();
+        toast("Deleted ✅");
+      }
+    });
+  }
+
+  init();
 </script>
 </body>
 </html>
