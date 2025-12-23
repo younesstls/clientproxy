@@ -6,426 +6,770 @@
   <title>Abonnements Dashboard</title>
   <style>
     :root{
-      --bg:#0b1220; --card:#111b2e; --muted:#93a4c7; --text:#eaf1ff;
-      --good:#2ecc71; --warn:#f1c40f; --bad:#ff5c7a; --line:#243150;
+      --bg:#070b14;
+      --panel:rgba(18,28,48,.72);
+      --panel2:rgba(18,28,48,.55);
+      --stroke:rgba(255,255,255,.08);
+      --stroke2:rgba(255,255,255,.12);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.62);
+      --btn:#2b5cff;
+      --btn2:#2f3b55;
+      --danger:#ff3b3b;
+      --ok:#18c26e;
+      --warn:#ffb020;
+      --shadow: 0 30px 70px rgba(0,0,0,.55);
+      --radius:18px;
+      --radius2:14px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,Segoe UI,Arial;background:linear-gradient(180deg,#060a13, #0b1220);color:var(--text)}
-    .wrap{max-width:1100px;margin:0 auto;padding:22px}
-    header{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    h1{margin:0;font-size:22px;letter-spacing:.3px}
-    .sub{color:var(--muted);font-size:13px}
-    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
-    .card{background:rgba(17,27,46,.9);border:1px solid rgba(36,49,80,.8);border-radius:14px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    .k{color:var(--muted);font-size:12px}
-    .v{font-size:26px;font-weight:700;margin-top:6px}
-    .panel{margin-top:14px;display:grid;gap:12px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    input, button, select{
-      background:#0e1730;color:var(--text);
-      border:1px solid rgba(36,49,80,.95);border-radius:12px;
-      padding:10px 12px;font-size:14px;outline:none;
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(70,105,255,.18), transparent 60%),
+        radial-gradient(900px 600px at 80% 20%, rgba(88,240,184,.10), transparent 55%),
+        radial-gradient(900px 700px at 50% 100%, rgba(255,110,110,.10), transparent 55%),
+        linear-gradient(180deg, #050810, #070b14 60%, #050810);
+      min-height:100vh;
+      padding:32px 18px 60px;
     }
-    input::placeholder{color:#7e8fb6}
-    button{cursor:pointer;transition:.15s transform}
-    button:hover{transform:translateY(-1px)}
-    .btn{background:#17305f}
-    .btn2{background:#1f3b74}
-    .btnDanger{background:#5a1630;border-color:#7a2240}
-    .hint{color:var(--muted);font-size:13px;margin-left:auto}
-    .tableWrap{margin-top:14px;overflow:auto;border-radius:14px;border:1px solid rgba(36,49,80,.85)}
-    table{width:100%;border-collapse:collapse;min-width:900px;background:rgba(17,27,46,.75)}
-    th,td{padding:12px 10px;border-bottom:1px solid rgba(36,49,80,.65);text-align:left}
-    th{position:sticky;top:0;background:#0f1933;z-index:1;font-size:13px;color:#cfe0ff}
-    td{font-size:14px}
-    .tag{display:inline-flex;align-items:center;gap:8px;padding:5px 9px;border-radius:999px;font-size:12px;border:1px solid rgba(255,255,255,.12)}
-    .good{background:rgba(46,204,113,.12);border-color:rgba(46,204,113,.35);color:#b9ffd2}
-    .warn{background:rgba(241,196,15,.12);border-color:rgba(241,196,15,.35);color:#fff1b6}
-    .bad{background:rgba(255,92,122,.12);border-color:rgba(255,92,122,.35);color:#ffc3cf}
-    .muted{color:var(--muted)}
-    .small{font-size:12px;color:var(--muted)}
-    .footer{margin-top:14px;color:var(--muted);font-size:12px;text-align:center}
-    .split{flex:1;min-width:220px}
-    @media (max-width:900px){
-      .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .wrap{max-width:1100px;margin:0 auto;}
+    .top{
+      display:flex; align-items:flex-start; justify-content:space-between;
+      gap:18px; margin-bottom:14px;
+    }
+    .title{
+      display:flex; flex-direction:column; gap:6px;
+    }
+    .title h1{
+      margin:0; font-size:28px; letter-spacing:.2px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .title small{color:var(--muted)}
+    .actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+    button{
+      border:1px solid var(--stroke);
+      background:var(--btn2);
+      color:var(--text);
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      box-shadow:none;
+      transition:.15s ease;
+      font-weight:600;
+    }
+    button:hover{transform:translateY(-1px); border-color:var(--stroke2)}
+    button.primary{background:var(--btn); border-color:rgba(43,92,255,.35)}
+    button.danger{background:rgba(255,59,59,.15); border-color:rgba(255,59,59,.25); color:#ffdede}
+    button.ghost{background:transparent}
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    .cards{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:12px;
+      margin:14px 0;
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(18,28,48,.65), rgba(18,28,48,.45));
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:var(--shadow);
+    }
+    .stat{
+      display:flex; flex-direction:column; gap:6px;
+    }
+    .stat .label{color:var(--muted); font-weight:600; font-size:13px}
+    .stat .value{font-size:26px; font-weight:800}
+    .panel{
+      background:linear-gradient(180deg, rgba(18,28,48,.65), rgba(18,28,48,.40));
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+    .panel h2{
+      margin:0 0 10px;
+      font-size:16px; color:rgba(255,255,255,.88);
+      font-weight:800;
+    }
+    .row{
+      display:flex; flex-wrap:wrap; gap:10px;
+      align-items:flex-end;
+    }
+    .field{
+      display:flex; flex-direction:column; gap:6px;
+      min-width:180px;
+      flex:1;
+    }
+    label{font-size:12px; color:var(--muted); font-weight:700}
+    input, select{
+      width:100%;
+      border:1px solid var(--stroke);
+      background:rgba(5,9,16,.65);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      outline:none;
+      font-weight:600;
+    }
+    input:focus, select:focus{border-color:rgba(43,92,255,.55)}
+    .hint{color:var(--muted); font-size:12px; margin-top:8px}
+    .statusLine{
+      display:flex; justify-content:space-between; align-items:center;
+      gap:10px; margin-top:10px; color:var(--muted); font-size:12px;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px;
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.18);
+      font-weight:700;
+    }
+    .dot{width:10px;height:10px;border-radius:50%}
+    .dot.ok{background:var(--ok)}
+    .dot.warn{background:var(--warn)}
+    .dot.err{background:var(--danger)}
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border-radius:var(--radius);
+      border:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(18,28,48,.55), rgba(18,28,48,.35));
+    }
+    thead th{
+      text-align:left;
+      font-size:12px;
+      color:rgba(255,255,255,.78);
+      padding:12px 12px;
+      border-bottom:1px solid var(--stroke);
+    }
+    tbody td{
+      padding:12px 12px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      vertical-align:middle;
+      font-weight:600;
+    }
+    tbody tr:last-child td{border-bottom:none}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.16);
+      font-size:12px;
+      font-weight:800;
+    }
+    .pill.ok{border-color:rgba(24,194,110,.30); background:rgba(24,194,110,.12)}
+    .pill.off{border-color:rgba(255,255,255,.14); background:rgba(255,255,255,.06); color:rgba(255,255,255,.70)}
+    .right{display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap}
+    .mini{padding:8px 10px; border-radius:12px; font-size:12px}
+    .mini.primary{background:rgba(43,92,255,.18); border-color:rgba(43,92,255,.25)}
+    .mini.danger{background:rgba(255,59,59,.14); border-color:rgba(255,59,59,.22)}
+    .mini.good{background:rgba(24,194,110,.14); border-color:rgba(24,194,110,.22)}
+    .footer{
+      margin-top:14px;
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      min-width:260px;
+      max-width:92vw;
+      background:rgba(0,0,0,.55);
+      border:1px solid var(--stroke);
+      color:rgba(255,255,255,.92);
+      padding:12px 14px;
+      border-radius:14px;
+      box-shadow:0 20px 50px rgba(0,0,0,.55);
+      display:none;
+      gap:10px;
+      align-items:center;
+      font-weight:700;
+      z-index:9999;
+      backdrop-filter: blur(8px);
+    }
+    .toast.show{display:flex}
+    .toast .dot{flex:0 0 auto}
+    @media (max-width: 980px){
+      .cards{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width: 560px){
+      .cards{grid-template-columns:1fr}
+      .actions{justify-content:flex-start}
     }
   </style>
 </head>
+
 <body>
   <div class="wrap">
-    <header>
-      <div>
+    <div class="top">
+      <div class="title">
         <h1>📊 Abonnements Dashboard</h1>
-        <div class="sub">Clients • Date fin auto • Jours restants • Telegram notifications</div>
+        <small>Clients • Date fin auto • Jours restants • Notifications Telegram (via Worker)</small>
       </div>
-      <div class="row">
-        <button class="btn2" id="btnExport">Export JSON</button>
-        <input type="file" id="fileImport" accept="application/json" style="display:none">
-        <button class="btn2" id="btnImport">Import JSON</button>
-        <button class="btnDanger" id="btnReset">Reset</button>
+      <div class="actions">
+        <button id="btnExport" class="primary">Export JSON</button>
+        <button id="btnImport">Import JSON</button>
+        <button id="btnReset" class="danger">Reset</button>
       </div>
-    </header>
-
-    <div class="stats">
-      <div class="card"><div class="k">Total</div><div class="v" id="stTotal">0</div></div>
-      <div class="card"><div class="k">Actifs</div><div class="v" id="stActifs">0</div></div>
-      <div class="card"><div class="k">Expire bientôt</div><div class="v" id="stSoon">0</div></div>
-      <div class="card"><div class="k">Expirés</div><div class="v" id="stExpired">0</div></div>
     </div>
 
-    <div class="panel card">
-      <div class="row">
-        <div class="split">
-          <div class="small">Telegram Bot Token</div>
-          <input id="tgToken" placeholder="YOUR_BOT_TOKEN" style="width:100%">
-        </div>
-        <div class="split">
-          <div class="small">Telegram Chat ID</div>
-          <input id="tgChatId" placeholder="YOUR_CHAT_ID" style="width:100%">
-        </div>
+    <div class="cards">
+      <div class="card stat">
+        <div class="label">Total</div>
+        <div class="value" id="statTotal">0</div>
       </div>
-
-      <div class="row">
-        <label class="small">Notifier si jours ≤</label>
-        <input id="thresh" type="number" min="0" value="2" style="width:90px">
-        <button class="btn" id="btnCheck">Check & Notify Telegram</button>
-        <button class="btn2" id="btnSaveTg">Save Telegram</button>
-        <span class="hint" id="statusTxt">Ready</span>
+      <div class="card stat">
+        <div class="label">Actifs</div>
+        <div class="value" id="statActifs">0</div>
       </div>
-
-      <hr style="border:0;border-top:1px solid rgba(36,49,80,.7);width:100%;margin:10px 0">
-
-      <div class="row">
-        <input id="clientName" placeholder="Client (nom)" />
-        <input id="startDate" type="date" />
-        <input id="duration" type="number" min="1" value="30" style="width:120px" />
-        <button class="btn2" id="btnAdd">➕ Add Client</button>
+      <div class="card stat">
+        <div class="label">Expire bientôt</div>
+        <div class="value" id="statSoon">0</div>
       </div>
-      <div class="small">مدة الاشتراك بالأيام (default 30). تقدر تغيّرها لكل واحد.</div>
+      <div class="card stat">
+        <div class="label">Expirés</div>
+        <div class="value" id="statExpired">0</div>
+      </div>
     </div>
 
-    <div class="tableWrap">
+    <div class="panel">
+      <h2>Cloudflare Worker (API)</h2>
+      <div class="row">
+        <div class="field" style="min-width:320px;flex:2">
+          <label>Worker Base URL</label>
+          <input id="workerBase" placeholder="https://xxx.yourname.workers.dev" />
+        </div>
+
+        <div class="field" style="min-width:160px;flex:1">
+          <label>Notifier si jours ≤</label>
+          <input id="thresholdDays" type="number" value="2" min="0" />
+        </div>
+
+        <button id="btnLoad" class="mini">Load (Cloud)</button>
+        <button id="btnSave" class="mini">Save (Cloud)</button>
+        <button id="btnCheck" class="mini primary">Check & Notify</button>
+      </div>
+
+      <div class="statusLine">
+        <div class="badge" id="badge">
+          <span class="dot warn"></span>
+          <span id="statusText">Ready</span>
+        </div>
+        <div class="hint">⚠️ Les secrets Telegram (BOT_TOKEN / CHAT_ID) كاينين فـ Worker، ماشي هنا.</div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <h2>Ajouter / Modifier un client</h2>
+      <div class="row">
+        <div class="field" style="min-width:260px;flex:2">
+          <label>Client (nom)</label>
+          <input id="clientName" placeholder="ex: houssa group 200 proxy 1500dh" />
+        </div>
+
+        <div class="field" style="min-width:170px;flex:1">
+          <label>Début</label>
+          <input id="startDate" type="date" />
+        </div>
+
+        <div class="field" style="min-width:140px;flex:1">
+          <label>Durée (jours)</label>
+          <input id="durationDays" type="number" value="30" min="1" />
+        </div>
+
+        <button id="btnAdd" class="primary">+ Add Client</button>
+      </div>
+      <div class="hint">يتم حساب <b>Fin</b> تلقائياً = Début + Durée. تقدر تغيّر/تجدّد من Actions.</div>
+    </div>
+
+    <div class="panel" style="margin-top:14px; padding:0">
       <table>
         <thead>
           <tr>
-            <th>Client</th>
+            <th style="width:34%">Client</th>
             <th>Début</th>
             <th>Durée</th>
             <th>Fin</th>
             <th>Jours restants</th>
             <th>Statut</th>
             <th>TelegramSent</th>
-            <th>Actions</th>
+            <th style="text-align:right">Actions</th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
       </table>
+      <div class="footer">by.bestfriend • KV + Worker • GitHub Pages</div>
     </div>
-
-    <div class="footer">by.bestfriend • HTML dashboard (LocalStorage) • Online with GitHub Pages</div>
   </div>
 
-<script>
-(() => {
-  const LS_KEY = "abon_dashboard_clients_v1";
-  const LS_TG = "abon_dashboard_tg_v1";
+  <div class="toast" id="toast">
+    <span class="dot ok" id="toastDot"></span>
+    <span id="toastMsg">OK</span>
+  </div>
 
-  const $ = (id) => document.getElementById(id);
-  const st = {
-    total: $("stTotal"),
-    actifs: $("stActifs"),
-    soon: $("stSoon"),
-    expired: $("stExpired"),
-    tbody: $("tbody"),
-    statusTxt: $("statusTxt"),
-    thresh: $("thresh"),
-    clientName: $("clientName"),
-    startDate: $("startDate"),
-    duration: $("duration"),
-    tgToken: $("tgToken"),
-    tgChatId: $("tgChatId"),
-  };
+  <input type="file" id="fileImport" accept="application/json" style="display:none" />
 
-  function setStatus(msg){ st.statusTxt.textContent = msg; }
+  <script>
+    // =========================
+    // 1) CONFIG (بدّل هاد الرابط)
+    // =========================
+    const DEFAULT_WORKER_BASE = "https://empty-wood-8ebe.youness-moumine-filali.workers.dev";
 
-  function todayISO(){
-    const d = new Date();
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth()+1).padStart(2,"0");
-    const dd = String(d.getDate()).padStart(2,"0");
-    return `${yyyy}-${mm}-${dd}`;
-  }
+    // =========================
+    // 2) STORAGE KEYS
+    // =========================
+    const LS_CLIENTS = "abo_clients_v2";
+    const LS_WORKER  = "abo_worker_base_v2";
+    const LS_THRESH  = "abo_threshold_days_v2";
 
-  function addDaysISO(startISO, days){
-    const d = new Date(startISO + "T00:00:00");
-    d.setDate(d.getDate() + Number(days || 0));
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth()+1).padStart(2,"0");
-    const dd = String(d.getDate()).padStart(2,"0");
-    return `${yyyy}-${mm}-${dd}`;
-  }
+    // =========================
+    // 3) STATE
+    // =========================
+    let clients = [];
+    let editingId = null;
 
-  function daysBetween(endISO){
-    const now = new Date();
-    const end = new Date(endISO + "T23:59:59");
-    const ms = end - now;
-    return Math.ceil(ms / (1000*60*60*24));
-  }
+    // =========================
+    // 4) DOM
+    // =========================
+    const elWorkerBase = document.getElementById("workerBase");
+    const elThreshold  = document.getElementById("thresholdDays");
+    const elName       = document.getElementById("clientName");
+    const elStart      = document.getElementById("startDate");
+    const elDuration   = document.getElementById("durationDays");
+    const tbody        = document.getElementById("tbody");
 
-  function statusFromDays(days, thresh){
-    if (days <= 0) return {text:"❌ Expiré", cls:"bad"};
-    if (days <= thresh) return {text:"⏰ Bientôt", cls:"warn"};
-    return {text:"✅ Actif", cls:"good"};
-  }
+    const statTotal    = document.getElementById("statTotal");
+    const statActifs   = document.getElementById("statActifs");
+    const statSoon     = document.getElementById("statSoon");
+    const statExpired  = document.getElementById("statExpired");
 
-  function loadClients(){
-    try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); }
-    catch { return []; }
-  }
+    const badge        = document.getElementById("badge");
+    const statusText   = document.getElementById("statusText");
 
-  function saveClients(clients){
-    localStorage.setItem(LS_KEY, JSON.stringify(clients));
-  }
+    const toast        = document.getElementById("toast");
+    const toastMsg     = document.getElementById("toastMsg");
+    const toastDot     = document.getElementById("toastDot");
 
-  function loadTg(){
-    try { return JSON.parse(localStorage.getItem(LS_TG) || "{}"); }
-    catch { return {}; }
-  }
+    // buttons
+    document.getElementById("btnAdd").addEventListener("click", onAddOrSave);
+    document.getElementById("btnReset").addEventListener("click", onReset);
 
-  function saveTg(obj){
-    localStorage.setItem(LS_TG, JSON.stringify(obj));
-  }
+    document.getElementById("btnExport").addEventListener("click", onExport);
+    document.getElementById("btnImport").addEventListener("click", () => document.getElementById("fileImport").click());
+    document.getElementById("fileImport").addEventListener("change", onImportFile);
 
-  function render(){
-    const clients = loadClients();
-    const thresh = Number(st.thresh.value || 2);
+    document.getElementById("btnLoad").addEventListener("click", loadFromCloud);
+    document.getElementById("btnSave").addEventListener("click", saveToCloud);
+    document.getElementById("btnCheck").addEventListener("click", checkAndNotify);
 
-    let total=clients.length, actifs=0, soon=0, expired=0;
-
-    st.tbody.innerHTML = "";
-
-    clients.forEach((c, idx) => {
-      const end = addDaysISO(c.start, c.duration);
-      const left = daysBetween(end);
-      const stt = statusFromDays(left, thresh);
-
-      if (left <= 0) expired++;
-      else if (left <= thresh) soon++;
-      else actifs++;
-
-      const tr = document.createElement("tr");
-
-      tr.innerHTML = `
-        <td><strong>${escapeHtml(c.name)}</strong></td>
-        <td class="muted">${c.start}</td>
-        <td class="muted">${c.duration} j</td>
-        <td class="muted">${end}</td>
-        <td><strong>${left}</strong> <span class="small">jours</span></td>
-        <td><span class="tag ${stt.cls}">${stt.text}</span></td>
-        <td class="muted">${c.telegramSent ? "✅" : "—"}</td>
-        <td>
-          <button class="btn2" data-act="renew" data-i="${idx}">Renew +30</button>
-          <button class="btn2" data-act="edit" data-i="${idx}">Edit</button>
-          <button class="btnDanger" data-act="del" data-i="${idx}">Delete</button>
-        </td>
-      `;
-
-      st.tbody.appendChild(tr);
-    });
-
-    st.total.textContent = total;
-    st.actifs.textContent = actifs;
-    st.soon.textContent = soon;
-    st.expired.textContent = expired;
-  }
-
-  function escapeHtml(s){
-    return String(s||"").replace(/[&<>"']/g, m => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-    }[m]));
-  }
-
-  async function sendTelegram(text){
-    const cfg = loadTg();
-    const token = (st.tgToken.value || cfg.token || "").trim();
-    const chatId = (st.tgChatId.value || cfg.chatId || "").trim();
-
-    if (!token || !chatId) {
-      throw new Error("Telegram token/chat_id man9awhomch. 3ammerhom w Save.");
+    // =========================
+    // Helpers
+    // =========================
+    function setStatus(type, text){
+      statusText.textContent = text;
+      const dot = badge.querySelector(".dot");
+      dot.classList.remove("ok","warn","err");
+      dot.classList.add(type);
     }
 
-    const url = `https://api.telegram.org/bot${token}/sendMessage`;
-    const r = await fetch(url, {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({ chat_id: chatId, text })
-    });
+    function showToast(type, msg){
+      toastMsg.textContent = msg;
+      toastDot.classList.remove("ok","warn","err");
+      toastDot.classList.add(type);
+      toast.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
 
-    const data = await r.json();
-    if (!data.ok) throw new Error(data.description || "Telegram error");
-    return data;
-  }
+    function todayISO(){
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
 
-  async function checkAndNotify(){
-    const clients = loadClients();
-    const thresh = Number(st.thresh.value || 2);
+    function addDays(dateISO, days){
+      const d = new Date(dateISO + "T00:00:00");
+      d.setDate(d.getDate() + Number(days || 0));
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
 
-    let sent = 0;
-    for (let i=0; i<clients.length; i++){
-      const c = clients[i];
-      const end = addDaysISO(c.start, c.duration);
-      const left = daysBetween(end);
+    function daysLeft(endISO){
+      const now = new Date();
+      const end = new Date(endISO + "T00:00:00");
+      const diff = end - now;
+      return Math.ceil(diff / (1000*60*60*24));
+    }
 
-      if (left <= thresh && left > -9999 && !c.telegramSent) {
-        const msg =
-`⏰ Abonnement قريب يسالي
-👤 Client: ${c.name}
-📆 Fin: ${end}
-⏳ باقي: ${left} أيام`;
-        await sendTelegram(msg);
-        c.telegramSent = true;
-        sent++;
+    function uid(){
+      return Math.random().toString(16).slice(2) + Date.now().toString(16);
+    }
+
+    function normalizeClient(c){
+      // expected: {id,name,start,durationDays,end,active,telegramSentAt?}
+      const start = c.start || todayISO();
+      const durationDays = Number(c.durationDays ?? 30);
+      const end = c.end || addDays(start, durationDays);
+      return {
+        id: c.id || uid(),
+        name: (c.name || "").trim(),
+        start,
+        durationDays,
+        end,
+        active: (c.active !== false),
+        telegramSentAt: c.telegramSentAt || null
+      };
+    }
+
+    function saveLocal(){
+      localStorage.setItem(LS_CLIENTS, JSON.stringify(clients));
+      localStorage.setItem(LS_WORKER, elWorkerBase.value.trim());
+      localStorage.setItem(LS_THRESH, elThreshold.value);
+    }
+
+    function loadLocal(){
+      try{
+        const raw = localStorage.getItem(LS_CLIENTS);
+        clients = raw ? JSON.parse(raw) : [];
+        clients = clients.map(normalizeClient);
+      }catch(e){
+        clients = [];
+      }
+      elWorkerBase.value = localStorage.getItem(LS_WORKER) || DEFAULT_WORKER_BASE;
+      elThreshold.value  = localStorage.getItem(LS_THRESH) || "2";
+    }
+
+    function workerBase(){
+      return (elWorkerBase.value || "").trim().replace(/\/+$/,"");
+    }
+
+    async function apiFetch(path, options={}){
+      const base = workerBase();
+      if(!base) throw new Error("Worker URL vide");
+      const res = await fetch(base + path, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(options.headers || {})
+        }
+      });
+      if(!res.ok){
+        const t = await res.text().catch(()=> "");
+        throw new Error(`API error ${res.status}: ${t || res.statusText}`);
+      }
+      return res;
+    }
+
+    // =========================
+    // Render
+    // =========================
+    function updateStats(){
+      const thr = Number(elThreshold.value || 0);
+      const total = clients.length;
+      const actifs = clients.filter(c=>c.active).length;
+      const soon = clients.filter(c=>c.active && daysLeft(c.end) <= thr && daysLeft(c.end) >= 0).length;
+      const expired = clients.filter(c=>daysLeft(c.end) < 0).length;
+
+      statTotal.textContent = total;
+      statActifs.textContent = actifs;
+      statSoon.textContent = soon;
+      statExpired.textContent = expired;
+    }
+
+    function render(){
+      updateStats();
+      tbody.innerHTML = "";
+
+      const sorted = [...clients].sort((a,b)=> (a.end.localeCompare(b.end)));
+
+      for(const c of sorted){
+        const tr = document.createElement("tr");
+
+        const left = daysLeft(c.end);
+        const isExpired = left < 0;
+
+        tr.innerHTML = `
+          <td>${escapeHtml(c.name || "-")}</td>
+          <td>${c.start}</td>
+          <td>${c.durationDays} j</td>
+          <td>${c.end}</td>
+          <td>${isExpired ? `<span style="color:#ff9b9b">${left}</span>` : left}</td>
+          <td>
+            <span class="pill ${c.active ? "ok" : "off"}">
+              ${c.active ? "✅ Actif" : "⏸️ Off"}
+            </span>
+          </td>
+          <td>${c.telegramSentAt ? escapeHtml(c.telegramSentAt) : "—"}</td>
+          <td style="text-align:right">
+            <div class="right">
+              <button class="mini good" data-act="renew" data-id="${c.id}">Renew +30</button>
+              <button class="mini" data-act="edit" data-id="${c.id}">Edit</button>
+              <button class="mini" data-act="toggle" data-id="${c.id}">${c.active ? "Disable" : "Enable"}</button>
+              <button class="mini danger" data-act="del" data-id="${c.id}">Delete</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      tbody.querySelectorAll("button[data-act]").forEach(btn=>{
+        btn.addEventListener("click", () => onRowAction(btn.dataset.act, btn.dataset.id));
+      });
+    }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    // =========================
+    // Actions
+    // =========================
+    async function onAddOrSave(){
+      const name = elName.value.trim();
+      const start = elStart.value || todayISO();
+      const dur = Number(elDuration.value || 30);
+
+      if(!name){
+        showToast("warn","Écris le nom du client");
+        return;
+      }
+
+      if(editingId){
+        const idx = clients.findIndex(x=>x.id===editingId);
+        if(idx >= 0){
+          clients[idx].name = name;
+          clients[idx].start = start;
+          clients[idx].durationDays = dur;
+          clients[idx].end = addDays(start, dur);
+        }
+        editingId = null;
+        document.getElementById("btnAdd").textContent = "+ Add Client";
+        showToast("ok","Client modifié");
+      } else {
+        clients.push(normalizeClient({
+          name,
+          start,
+          durationDays: dur,
+          active: true
+        }));
+        showToast("ok","Client ajouté");
+      }
+
+      elName.value = "";
+      elStart.value = todayISO();
+      elDuration.value = "30";
+
+      saveLocal();
+      render();
+
+      // auto sync to cloud
+      try{
+        await saveToCloud(true);
+      }catch(e){
+        console.error(e);
       }
     }
 
-    saveClients(clients);
-    render();
-    setStatus(sent ? `✅ Sent ${sent} Telegram msg(s)` : "No notifications to send.");
-  }
+    function onRowAction(act, id){
+      const c = clients.find(x=>x.id===id);
+      if(!c) return;
 
-  // Actions
-  document.addEventListener("click", (e) => {
-    const btn = e.target.closest("button");
-    if (!btn) return;
+      if(act==="renew"){
+        const newStart = c.start; // keep same start
+        const newDur = Number(c.durationDays || 30) + 30;
+        c.durationDays = newDur;
+        c.end = addDays(newStart, newDur);
+        showToast("ok","+30 jours");
+        saveLocal();
+        render();
+        saveToCloud(true).catch(()=>{});
+        return;
+      }
 
-    const act = btn.getAttribute("data-act");
-    const i = btn.getAttribute("data-i");
-    if (!act) return;
+      if(act==="edit"){
+        editingId = c.id;
+        elName.value = c.name;
+        elStart.value = c.start;
+        elDuration.value = c.durationDays;
+        document.getElementById("btnAdd").textContent = "Save Edit";
+        showToast("warn","Mode édition");
+        return;
+      }
 
-    const clients = loadClients();
-    const idx = Number(i);
+      if(act==="toggle"){
+        c.active = !c.active;
+        showToast("ok", c.active ? "Activé" : "Désactivé");
+        saveLocal();
+        render();
+        saveToCloud(true).catch(()=>{});
+        return;
+      }
 
-    if (act === "del") {
-      if (!confirm("Delete this client?")) return;
-      clients.splice(idx, 1);
-      saveClients(clients);
+      if(act==="del"){
+        if(!confirm("Supprimer ce client ?")) return;
+        clients = clients.filter(x=>x.id!==id);
+        showToast("ok","Supprimé");
+        saveLocal();
+        render();
+        saveToCloud(true).catch(()=>{});
+        return;
+      }
+    }
+
+    function onReset(){
+      if(!confirm("Reset: supprimer tous les clients ?")) return;
+      clients = [];
+      editingId = null;
+      saveLocal();
       render();
-      return;
+      showToast("ok","Reset local OK");
+      // optional: also cloud
+      saveToCloud(true).catch(()=>{});
     }
 
-    if (act === "renew") {
-      // renew: start = today, telegramSent=false, duration stays
-      clients[idx].start = todayISO();
-      clients[idx].telegramSent = false;
-      saveClients(clients);
+    // =========================
+    // Cloud (KV via Worker)
+    // =========================
+    async function loadFromCloud(){
+      try{
+        setStatus("warn","Loading cloud...");
+        const r = await apiFetch("/api/clients", { method:"GET" });
+        const list = await r.json();
+        clients = Array.isArray(list) ? list.map(normalizeClient) : [];
+        saveLocal();
+        render();
+        setStatus("ok","Cloud loaded ✅");
+        showToast("ok","Load cloud OK");
+      }catch(e){
+        console.error(e);
+        setStatus("err","Load cloud failed ❌");
+        showToast("err", e.message);
+      }
+    }
+
+    async function saveToCloud(silent=false){
+      try{
+        if(!silent) setStatus("warn","Saving cloud...");
+        await apiFetch("/api/clients", {
+          method:"PUT",
+          body: JSON.stringify(clients)
+        });
+        if(!silent){
+          setStatus("ok","Cloud saved ✅");
+          showToast("ok","Save cloud OK");
+        }
+      }catch(e){
+        console.error(e);
+        setStatus("err","Save cloud failed ❌");
+        if(!silent) showToast("err", e.message);
+        throw e;
+      }
+    }
+
+    async function checkAndNotify(){
+      try{
+        setStatus("warn","Checking + notify...");
+        const thr = Number(elThreshold.value || 2);
+        const r = await apiFetch("/api/check", {
+          method:"POST",
+          body: JSON.stringify({ thresholdDays: thr })
+        });
+        const out = await r.json().catch(()=> ({}));
+        setStatus("ok","Check done ✅");
+        showToast("ok", `Done. Sent: ${out.sent ?? "?"}`);
+      }catch(e){
+        console.error(e);
+        setStatus("err","Check failed ❌");
+        showToast("err", e.message);
+      }
+    }
+
+    // =========================
+    // Export / Import
+    // =========================
+    function onExport(){
+      const data = {
+        workerBase: workerBase(),
+        thresholdDays: Number(elThreshold.value || 2),
+        clients
+      };
+      const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "abonnements_export.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToast("ok","Export OK");
+    }
+
+    async function onImportFile(ev){
+      const f = ev.target.files && ev.target.files[0];
+      ev.target.value = "";
+      if(!f) return;
+
+      try{
+        const txt = await f.text();
+        const data = JSON.parse(txt);
+
+        if(data.workerBase) elWorkerBase.value = String(data.workerBase);
+        if(data.thresholdDays != null) elThreshold.value = String(data.thresholdDays);
+
+        if(Array.isArray(data.clients)){
+          clients = data.clients.map(normalizeClient);
+        } else if (Array.isArray(data)) {
+          clients = data.map(normalizeClient);
+        } else {
+          throw new Error("JSON format غير معروف");
+        }
+
+        saveLocal();
+        render();
+        showToast("ok","Import OK");
+        // auto sync to cloud
+        await saveToCloud(true);
+      }catch(e){
+        console.error(e);
+        showToast("err", e.message);
+      }
+    }
+
+    // =========================
+    // INIT
+    // =========================
+    (function init(){
+      loadLocal();
+      if(!elStart.value) elStart.value = todayISO();
+
+      // live-save settings
+      elWorkerBase.addEventListener("change", ()=>{ saveLocal(); });
+      elThreshold.addEventListener("change", ()=>{ saveLocal(); render(); });
+
       render();
-      return;
-    }
 
-    if (act === "edit") {
-      const c = clients[idx];
-      const newName = prompt("Client name:", c.name);
-      if (newName === null) return;
-      const newStart = prompt("Start date (YYYY-MM-DD):", c.start);
-      if (newStart === null) return;
-      const newDur = prompt("Duration days:", String(c.duration));
-      if (newDur === null) return;
-
-      clients[idx].name = newName.trim() || c.name;
-      clients[idx].start = newStart.trim() || c.start;
-      clients[idx].duration = Number(newDur) || c.duration;
-      clients[idx].telegramSent = false; // reset after edit
-      saveClients(clients);
-      render();
-      return;
-    }
-  });
-
-  $("btnAdd").addEventListener("click", () => {
-    const name = st.clientName.value.trim();
-    const start = (st.startDate.value || todayISO()).trim();
-    const duration = Number(st.duration.value || 30);
-
-    if (!name) { setStatus("❌ Zid smiya dyal client"); return; }
-
-    const clients = loadClients();
-    clients.unshift({ name, start, duration, telegramSent:false });
-    saveClients(clients);
-
-    st.clientName.value = "";
-    st.startDate.value = "";
-    st.duration.value = 30;
-
-    render();
-    setStatus("✅ Client added");
-  });
-
-  $("btnCheck").addEventListener("click", async () => {
-    setStatus("⏳ Checking...");
-    try {
-      await checkAndNotify();
-    } catch (err) {
-      setStatus("❌ " + (err?.message || err));
-    }
-  });
-
-  $("btnSaveTg").addEventListener("click", () => {
-    const token = st.tgToken.value.trim();
-    const chatId = st.tgChatId.value.trim();
-    saveTg({ token, chatId });
-    setStatus("✅ Telegram saved in LocalStorage");
-  });
-
-  $("btnReset").addEventListener("click", () => {
-    if (!confirm("Reset ALL data?")) return;
-    localStorage.removeItem(LS_KEY);
-    render();
-    setStatus("✅ Reset done");
-  });
-
-  $("btnExport").addEventListener("click", () => {
-    const clients = loadClients();
-    const blob = new Blob([JSON.stringify(clients, null, 2)], {type:"application/json"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "clients_abonnements.json";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  });
-
-  $("btnImport").addEventListener("click", () => $("fileImport").click());
-  $("fileImport").addEventListener("change", async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try{
-      const text = await file.text();
-      const data = JSON.parse(text);
-      if (!Array.isArray(data)) throw new Error("Invalid JSON");
-      // sanitize
-      const clients = data.map(x => ({
-        name: String(x.name || x.client || "Client").trim(),
-        start: String(x.start || x.dateDebut || todayISO()).slice(0,10),
-        duration: Number(x.duration || x.duree || 30),
-        telegramSent: !!x.telegramSent
-      }));
-      saveClients(clients);
-      render();
-      setStatus("✅ Imported");
-    }catch(err){
-      setStatus("❌ Import error: " + (err?.message || err));
-    } finally {
-      e.target.value = "";
-    }
-  });
-
-  // Init
-  const tg = loadTg();
-  if (tg.token) st.tgToken.value = tg.token;
-  if (tg.chatId) st.tgChatId.value = tg.chatId;
-
-  st.startDate.value = todayISO();
-  render();
-})();
-</script>
+      // auto load from cloud on start
+      loadFromCloud().catch(()=>{});
+    })();
+  </script>
 </body>
 </html>
